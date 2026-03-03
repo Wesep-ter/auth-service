@@ -3,13 +3,12 @@ package com.bank.auth_service.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +16,9 @@ public class User {
     private Long id;
 
     @Column(name = "roles")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles")
+    @Enumerated(value = EnumType.STRING)
     private Set<Role> roles;
 
     @Column(name = "name")
