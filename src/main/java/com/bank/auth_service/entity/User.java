@@ -3,6 +3,8 @@ package com.bank.auth_service.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -31,7 +33,7 @@ public class User {
     private String middleName;
 
     @Column(name = "birthday")
-    private String birthday;
+    private LocalDate birthday;
 
     @Column(name = "user_login")
     private String userLogin;
