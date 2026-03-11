@@ -2,8 +2,8 @@ package com.bank.auth_service.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -11,6 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "users")
+@RequiredArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

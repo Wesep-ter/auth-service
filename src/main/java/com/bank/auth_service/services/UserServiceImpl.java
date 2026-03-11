@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void create(UserDto item) {
+    public void addUser(UserDto item) {
 
     }
 

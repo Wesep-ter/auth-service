@@ -1,47 +1,71 @@
 package com.bank.auth_service.security.jwt;
-import com.bank.auth_service.dto.JwtAuthenticationDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 public class JwtService {
 
-    @Value("61c4988c015b91c7998d0d7357d7e182851a1384f035c14825bd5e2be421a58c")
+    @Value("${token.key}")
     private String key;
 
     private static final Logger LOGGER = LogManager.getLogger(JwtService.class);
 
     private final long jwtExpiration = 3600000;
 
+
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(key);
         return Keys.hmacShaKeyFor(key.getBytes());
     }
 
-    public JwtAuthenticationDto RefreshBaseToken(String username, String refreshToken){
-        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
-        jwtDto.setToken(generateJwtToken(username));
-        jwtDto.setRefreshToken(refreshToken);
-        return jwtDto;
+    public TokenData parseToken(String token){
+        Claims claims = getAllClaims(token);
+        return TokenData.builder()
+                .id((Long)claims.get("id"))
+                .name((String)claims.get("name"))
+                .lastName((String)claims.get("lastName"))
+                .roles((List<String>) claims.get("roles"))
+                .build();
     }
 
-    public JwtAuthenticationDto generateAuthToken(String username){
-        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
-        jwtDto.setToken(generateJwtToken(username));
-        jwtDto.setRefreshToken(generateRefreshToken(username));
-        return jwtDto;
+    private Claims getAllClaims(String token){
+        return Jwts.parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    public String getUsernameFromToken(String token){
+
+//    public JwtAuthenticationDto RefreshBaseToken(String username, String refreshToken){
+//        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
+//        jwtDto.setToken(generateJwtToken(username));
+//        jwtDto.setRefreshToken(refreshToken);
+//        return jwtDto;
+//    }
+
+
+//    public JwtAuthenticationDto generateAuthToken(String username){
+//        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
+//        jwtDto.setToken(generateJwtToken(username));
+//        jwtDto.setRefreshToken(generateRefreshToken(username));
+//        return jwtDto;
+//    }
+
+
+    public String getLoginFromToken(String token){
         Claims claims = Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()
@@ -49,6 +73,7 @@ public class JwtService {
                 .getPayload();
         return claims.getSubject();
     }
+
 
     public boolean validateJwtToken(String token){
         try {
@@ -72,16 +97,27 @@ public class JwtService {
         return false;
     }
 
-    public String generateJwtToken(String username){
+
+    public String generateJwtToken(CustomUserDetails customUserDetails){
         Date now = new Date();
         Date expireDate = Date.from(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
+        HashMap<String,Object> claims = new HashMap<>();
+        claims.put("id", customUserDetails.getUser().getId());
+        claims.put("name", customUserDetails.getUser().getName());
+        claims.put("lastName", customUserDetails.getUser().getLastName());
+        claims.put("roles", customUserDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList());
         return Jwts.builder()
-                .subject(username)
+                .subject(customUserDetails.getUsername())
                 .issuedAt(now)
                 .expiration(expireDate)
+                .claims(claims)
                 .signWith(getSignInKey())
                 .compact();
     }
+
 
     public String generateRefreshToken(String username){
         Date now = new Date();
