@@ -100,7 +100,7 @@ public class JwtService {
 
     public String generateJwtToken(CustomUserDetails customUserDetails){
         Date now = new Date();
-        Date expireDate = Date.from(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
+        Date expireDate = Date.from(LocalDateTime.now().plusMinutes(10).atZone(ZoneId.systemDefault()).toInstant());
         HashMap<String,Object> claims = new HashMap<>();
         claims.put("id", customUserDetails.getUser().getId());
         claims.put("name", customUserDetails.getUser().getName());

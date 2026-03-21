@@ -1,6 +1,5 @@
 package com.bank.auth_service.security.jwt;
 import com.bank.auth_service.entity.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,11 +7,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
-@AllArgsConstructor
+
 public class CustomUserDetails implements UserDetails {
 
     @Getter
     private User user;
+
+    public CustomUserDetails(User user) {
+        this.user = user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
