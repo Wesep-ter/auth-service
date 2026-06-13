@@ -9,6 +9,9 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 server:
   port: 7080
+
+token:
+  key: 61c4988c015b91c7998d0d7357d7e182851a1384f035c14825bd5e2be421a58c

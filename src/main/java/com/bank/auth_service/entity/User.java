@@ -1,14 +1,18 @@
 package com.bank.auth_service.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +35,7 @@ public class User {
     private String middleName;
 
     @Column(name = "birthday")
-    private String birthday;
+    private LocalDate birthday;
 
     @Column(name = "user_login")
     private String userLogin;
